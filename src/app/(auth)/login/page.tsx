@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import axiosInstance from '../../../../axios/axios.config';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { AxiosError } from 'axios';
 type LoginForm = {
     username: string;
     password: string;
@@ -17,7 +18,6 @@ function page() {
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors, isLoading },
     } = useForm<LoginForm>()
     const onSubmit = async (data: LoginForm) => {
