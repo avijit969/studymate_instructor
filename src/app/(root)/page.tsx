@@ -1,9 +1,7 @@
 'use client';
-import { ModeToggle } from "@/components/toggle-button";
 import { Button } from "@/components/ui/button";
-import axiosInstance from "../../axios/axios.config";
+import axiosInstance from "../../../axios/axios.config";
 import { useState } from "react";
-
 export default function Home() {
   const [videos, setVideos] = useState([]);
   const handleGetAllVideos = async () => {
@@ -17,13 +15,8 @@ export default function Home() {
     }
   }
   return (
-    <main>
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Button variant={"outline"}>Test</Button>
-        <ModeToggle />
-        <Button className="mt-4" variant="outline" onClick={handleGetAllVideos}>Get All Videos </Button>
-        <p>{JSON.stringify(videos, null, 2)}</p>
-      </div>
+    <main className='w-full'>
+      <h1>Home</h1>
     </main>
   );
 }
