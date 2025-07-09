@@ -1,5 +1,5 @@
 'use client';
-import { Calendar, ChevronDown, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, ChartBarBig, ChevronDown, GitGraphIcon, Home, Inbox, LayoutDashboard, MessageCircle, Search, Settings, AlignEndHorizontal, ListVideo, Video } from "lucide-react"
 
 import {
     Sidebar,
@@ -21,31 +21,36 @@ const upperItems = [
     {
         title: "Dashboard",
         url: "/",
-        icon: Home,
+        icon: <LayoutDashboard />,
     }
 ]
 const learningVideos = [
     {
         title: "All Videos",
         url: "/videos",
-        icon: Search,
+        icon: <ListVideo />,
     },
     {
-        title: "Add Video",
-        url: "/videos",
-        icon: Calendar,
+        title: "Uplaod Video",
+        url: "/videos/upload",
+        icon: <Video />,
     }
 ]
 const lowerItems = [
     {
-        title: "Settings",
-        url: "/settings",
-        icon: Settings,
+        title: "Analytics",
+        url: "/analytics",
+        icon: <AlignEndHorizontal />,
     },
     {
-        title: "Inbox",
-        url: "/inbox",
-        icon: Inbox,
+        title: "Chats",
+        url: "/chat",
+        icon: <MessageCircle />,
+    },
+    {
+        title: "Settings",
+        url: "/settings",
+        icon: <Settings />,
     },
 ]
 export function AppSidebar() {
@@ -72,7 +77,7 @@ export function AppSidebar() {
                                         }}>
                                             <SidebarMenuButton asChild>
                                                 <Link href={item.url}>
-                                                    <item.icon />
+                                                    {item.icon}
                                                     <span>{item.title}</span>
                                                 </Link>
                                             </SidebarMenuButton>
@@ -95,8 +100,7 @@ export function AppSidebar() {
                                                     toggleSidebar()
                                                 }}>
                                                     <Link href={item.url}>
-
-                                                        <item.icon />
+                                                        {item.icon}
                                                         <span>{item.title}</span>
                                                     </Link>
                                                 </SidebarMenuButton>
@@ -116,7 +120,7 @@ export function AppSidebar() {
                                     }}>
                                         <SidebarMenuButton asChild>
                                             <Link href={item.url}>
-                                                <item.icon />
+                                                {item.icon}
                                                 <span>{item.title}</span>
                                             </Link>
                                         </SidebarMenuButton>
