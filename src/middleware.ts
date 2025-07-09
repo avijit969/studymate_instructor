@@ -12,7 +12,14 @@ export default async function middleware(req: NextRequest) {
 
   const cookie = req.cookies.get("accessToken")?.value;
   let session = { userId: null };
-
+  if (!cookie) {
+    if (isProtectedRoute) {
+      return NextResponse.redirect(new URL("/login", req.nextUrl));
+    }
+    if (isPublicRoute) {
+      return NextResponse.next();
+    }
+  }
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/isLoggedIn`,
