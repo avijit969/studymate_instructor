@@ -29,6 +29,7 @@ function page() {
             toast.success("Login successful!")
             router.push('/')
         } catch (error: any) {
+            console.error("Error during login:", error);
             console.error("Error during login:", error?.response?.data?.message);
             toast.error(error?.response?.data?.message || "An error occurred during login");
         }
