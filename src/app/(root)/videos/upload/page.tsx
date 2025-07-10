@@ -10,129 +10,163 @@ import {
     SelectTrigger,
     SelectValue,
     SelectContent,
-    SelectItem
+    SelectItem,
 } from '@/components/ui/select'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import axiosInstance from '../../../../../axios/axios.config'
+import toast from 'react-hot-toast'
+import { useForm, Controller } from 'react-hook-form'
+
+interface VideoForm {
+    title: string
+    description: string
+    selectedCategory: string
+    customCategory: string
+    thumbnail: FileList
+    video: FileList
+}
+
+const learningCategories = [
+    { label: "Programming", value: "programming" },
+    { label: "Design", value: "design" },
+    { label: "Math", value: "math" },
+    { label: "Science", value: "science" },
+    { label: "Language", value: "language" },
+    { label: "History", value: "history" },
+    { label: "Geography", value: "geography" },
+    { label: "Biology", value: "biology" },
+    { label: "Physics", value: "physics" },
+    { label: "Chemistry", value: "chemistry" },
+    { label: "Economics", value: "economics" },
+    { label: "Psychology", value: "psychology" },
+    { label: "Business", value: "business" },
+    { label: "Marketing", value: "marketing" },
+    { label: "Photography", value: "photography" },
+    { label: "Art", value: "art" },
+    { label: "Music", value: "music" },
+    { label: "Health", value: "health" },
+    { label: "Fitness", value: "fitness" },
+    { label: "Finance", value: "finance" }
+];
 
 export default function Page() {
     const router = useRouter()
-
-    const [form, setForm] = useState({
-        title: '',
-        description: '',
-        category: '',
-    })
-
-    const [thumbnail, setThumbnail] = useState<File | null>(null)
-    const [video, setVideo] = useState<File | null>(null)
+    const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
+    const [videoPreview, setVideoPreview] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value })
-    }
+    const {
+        register,
+        handleSubmit,
+        control,
+        reset,
+        formState: { errors },
+    } = useForm<VideoForm>()
 
-    const handleSubmit = async () => {
-        if (!form.title || !form.description || !form.category || !thumbnail || !video) {
-            alert('All fields are required.')
+    const onSubmit = async (data: VideoForm) => {
+        if (!data.thumbnail?.[0] || !data.video?.[0]) {
+            toast.error('Thumbnail and video are required.')
             return
         }
 
+        const finalCategory = data.customCategory.trim() || data.selectedCategory
+
+        if (!finalCategory) {
+            toast.error('Please select or enter a category.')
+            return
+        }
+
+        const formData = new FormData()
+        formData.append('title', data.title)
+        formData.append('description', data.description)
+        formData.append('category', finalCategory)
+        formData.append('thumbnail', data.thumbnail[0])
+        formData.append('learning_video', data.video[0])
+
         try {
             setLoading(true)
-
-            const formData = new FormData()
-            formData.append('title', form.title)
-            formData.append('description', form.description)
-            formData.append('category', form.category)
-            formData.append('thumbnail', thumbnail)
-            formData.append('learning_video', video)
-
             await axiosInstance.post('/learning/learning_video', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             })
 
-            alert('Video uploaded successfully!')
+            toast.success('Video uploaded successfully.')
             router.push('/')
         } catch (err) {
             console.error(err)
-            alert('Upload failed.')
+            toast.error('Failed to upload video.')
         } finally {
             setLoading(false)
         }
     }
 
     const handleReset = () => {
-        setForm({
-            title: '',
-            description: '',
-            category: '',
-        })
-        setThumbnail(null)
-        setVideo(null)
+        reset()
+        setThumbnailPreview(null)
+        setVideoPreview(null)
     }
 
     return (
         <div className="max-w-4xl mx-auto p-6 space-y-6">
             <h1 className="text-2xl font-bold">Upload New Video</h1>
 
-            <div className="space-y-4">
-                <div>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="space-y-2">
                     <Label htmlFor="title">Title</Label>
-                    <Input
-                        id="title"
-                        name="title"
-                        value={form.title}
-                        onChange={handleChange}
-                        placeholder="Enter video title"
-                    />
+                    <Input {...register('title', { required: true })} placeholder="Enter video title" />
+                    {errors.title && <p className="text-red-500 text-sm">Title is required</p>}
                 </div>
 
-                <div>
+                <div className="space-y-2">
                     <Label htmlFor="description">Description</Label>
                     <Textarea
-                        id="description"
-                        name="description"
-                        value={form.description}
-                        onChange={handleChange}
+                        {...register('description', { required: true })}
                         placeholder="Enter video description"
                     />
+                    {errors.description && <p className="text-red-500 text-sm">Description is required</p>}
                 </div>
 
-                <div>
-                    <Label htmlFor="category">Category</Label>
-                    <Select
-                        value={form.category}
-                        onValueChange={(value) => setForm({ ...form, category: value })}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="programming">Programming</SelectItem>
-                            <SelectItem value="design">Design</SelectItem>
-                            <SelectItem value="math">Math</SelectItem>
-                            <SelectItem value="science">Science</SelectItem>
-                            <SelectItem value="language">Language</SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="space-y-2 w-full">
+                    <Label htmlFor="selectedCategory">Category</Label>
+                    <Controller
+                        name="selectedCategory"
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {learningCategories.map((cat) => (
+                                        <SelectItem key={cat.value} value={cat.value}>
+                                            {cat.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        )}
+                    />
+                    <p className='text-sm text-muted-foreground'>Or type your own</p>
+                    <Input {...register('customCategory')} placeholder="Enter custom category" />
                 </div>
 
-                <div>
+                <div className="space-y-2">
                     <Label htmlFor="thumbnail">Thumbnail</Label>
                     <Input
                         id="thumbnail"
                         type="file"
                         accept="image/*"
+                        {...register('thumbnail', { required: true })}
                         onChange={(e) => {
-                            if (e.target.files?.[0]) setThumbnail(e.target.files[0])
+                            const file = e.target.files?.[0]
+                            if (file) setThumbnailPreview(URL.createObjectURL(file))
                         }}
                     />
-                    {thumbnail && (
+                    {thumbnailPreview && (
                         <div className="mt-2">
                             <Image
-                                src={URL.createObjectURL(thumbnail)}
+                                src={thumbnailPreview}
                                 width={800}
                                 height={450}
                                 alt="Thumbnail Preview"
@@ -140,38 +174,42 @@ export default function Page() {
                             />
                         </div>
                     )}
+                    {errors.thumbnail && <p className="text-red-500 text-sm">Thumbnail is required</p>}
                 </div>
 
-                <div>
+                <div className="space-y-2">
                     <Label htmlFor="video">Video File</Label>
                     <Input
                         id="video"
                         type="file"
                         accept="video/*"
+                        {...register('video', { required: true })}
                         onChange={(e) => {
-                            if (e.target.files?.[0]) setVideo(e.target.files[0])
+                            const file = e.target.files?.[0]
+                            if (file) setVideoPreview(URL.createObjectURL(file))
                         }}
                     />
-                    {video && (
+                    {videoPreview && (
                         <div className="mt-2">
                             <video
                                 controls
                                 className="w-full max-w-4xl rounded-md aspect-video shadow"
-                                src={URL.createObjectURL(video)}
+                                src={videoPreview}
                             />
                         </div>
                     )}
+                    {errors.video && <p className="text-red-500 text-sm">Video is required</p>}
                 </div>
 
                 <div className="flex gap-3">
-                    <Button onClick={handleSubmit} disabled={loading}>
+                    <Button type="submit" disabled={loading}>
                         {loading ? 'Uploading...' : 'Upload'}
                     </Button>
                     <Button variant="outline" type="button" onClick={handleReset}>
                         Reset
                     </Button>
                 </div>
-            </div>
+            </form>
         </div>
     )
 }

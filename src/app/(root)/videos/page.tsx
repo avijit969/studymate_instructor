@@ -28,6 +28,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
+import Link from 'next/link'
 
 export default function Page() {
     const [videos, setVideos] = useState<any[]>([])
@@ -94,20 +95,22 @@ export default function Page() {
                     <>
                         {videos.map((video: any, index: number) => (
                             <div key={index} className="flex justify-between border p-4 rounded-lg mt-4">
-                                <div className="flex items-center gap-4">
-                                    <span className="text-sm text-muted-foreground">{(page - 1) * pageSize + index + 1}</span>
-                                    <Image
-                                        src={video.thumbnail || '/placeholder.png'}
-                                        alt={video.title || 'No title'}
-                                        width={400}
-                                        height={250}
-                                        className="rounded-2xl w-40 h-24 lg:w-[400px] lg:h-[250px] object-cover"
-                                    />
-                                </div>
-                                <div className="flex-1 flex flex-col ml-4">
-                                    <p className="font-medium">{video.title || 'Untitled'}</p>
-                                    <p className="text-sm text-muted-foreground text-wrap">{video.description || 'No description provided.'}</p>
-                                </div>
+                                <Link href={`/videos/${video._id}`} className="flex">
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-sm text-muted-foreground">{(page - 1) * pageSize + index + 1}</span>
+                                        <Image
+                                            src={video.thumbnail || '/placeholder.png'}
+                                            alt={video.title || 'No title'}
+                                            width={400}
+                                            height={250}
+                                            className="rounded-2xl w-40 h-24 lg:w-[400px] lg:h-[250px] object-cover"
+                                        />
+                                    </div>
+                                    <div className="flex-1 flex flex-col ml-4">
+                                        <p className="font-medium">{video.title || 'Untitled'}</p>
+                                        <p className="text-sm text-muted-foreground text-wrap">{video.description || 'No description provided.'}</p>
+                                    </div>
+                                </Link>
                                 <div>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger>

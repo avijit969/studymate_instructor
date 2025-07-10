@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Label } from "@/components/ui/label"
+import toast from "react-hot-toast"
 
 type Uploader = {
     _id: string
@@ -78,8 +79,10 @@ export default function Page() {
             setVideo(response.data.data)
             setNewThumbnail(null)
             setNewVideo(null)
+            toast.success("Video updated successfully.")
         } catch (error) {
             console.error("Failed to update video:", error)
+            toast.error("Failed to update video.")
         }
     }
 
